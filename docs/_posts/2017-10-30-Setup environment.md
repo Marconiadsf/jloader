@@ -23,21 +23,20 @@ After finishing creating your cross compiler,
 next step is getting the sources of a kernel 
 skeleton. For a initial set you can both clone 
 Meaty Skeleton repository (more information at 
-OSDev wiki) or clone JLoader commit <insertcommitwhenready>.
+OSDev wiki) or clone JLoader commit [cd571cd](https://github.com/Marconiadsf/JLoader/tree/cd571cd8f6b96ed881a63a4a58a52aedb753b6e1).
 
 If you clone JLoader (recommended) you will get 
 improved versions of tty initial driver, printf,
-and some extra string functions.
+and some extra string functions. There will be 
+also some differences to the boot.S file in the
+kernel/arch/i386/ directory. Check that.
 
 For both options you need to change the following
 line in your config.sh file:
 
 ```shell
-
 export PATH="$HOME/opt/cross/bin:$PATH"
-
 ```
-
 to the right path to your cross compiler.
 
 

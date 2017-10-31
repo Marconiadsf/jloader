@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en-US" >
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/assets/css/style.css?v=">
+
+<!-- Begin Jekyll SEO tag v2.3.0 -->
+<title>JLoader | JLoader is a freestanding program to load JAOS higher-half kernel</title>
+<meta property="og:title" content="JLoader" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="JLoader is a freestanding program to load JAOS higher-half kernel" />
+<meta property="og:description" content="JLoader is a freestanding program to load JAOS higher-half kernel" />
+<link rel="canonical" href="http://localhost:4000/" />
+<meta property="og:url" content="http://localhost:4000/" />
+<meta property="og:site_name" content="JLoader" />
+<script type="application/ld+json">
+{"name":"JLoader","description":"JLoader is a freestanding program to load JAOS higher-half kernel","author":null,"@type":"WebSite","url":"http://localhost:4000/","publisher":null,"image":null,"headline":"JLoader","dateModified":null,"datePublished":null,"sameAs":null,"mainEntityOfPage":null,"@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>JLoader</h1>
+        <h2>JLoader is a freestanding program to load JAOS higher-half kernel</h2>
+
+        <section id="downloads">
+          
+            <a href="" class="btn">Download as .zip</a>
+            <a href="" class="btn">Download as .tar.gz</a>
+          
+          <a href="" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
+     <aside class="sidebar">
+		<section>
+			<span><a href="http://localhost:4000/JLoader"> &#62;&#62;Home</a></span><br>
+			
+			 
+				<!-- -->
+				<span><a href="/2017/10/31/Getting-multiboot-info.html"> &#62;&#62;Getting multiboot info</a></span><br>
+				  <!-- Oct 31, 2017 -->
+			  
+			
+			 
+				<!-- -->
+				<span><a href="/2017/10/30/Setup-environment.html"> &#62;&#62;Setup environment</a></span><br>
+				  <!-- Oct 30, 2017 -->
+			  
+			
+		</section>
+	  </aside>
+    <div class="container" >
+      <section id="main_content">
+        <h1 id="jloader-web-site">&gt;JLoader web site</h1>
+
+<p>Welcome to JLoader (JAOS Loader )home page.</p>
+
+<h2 id="what-is-jloader">&gt;What is JLoader?</h2>
+
+<p>JLoader is a second stage boot loader for my 
+Hobby operational system, JAOS.</p>
+
+<p>Currently it depends on Grub to work. After
+loading, it will search in a initrd.tar file
+loaded as a module for the kernel file, load 
+it in the higher half of virtual memory, at 
+address 0xC0000000 (<em>however that’s not a 
+requirement, as the loading location will be
+determined at execution time, based on the 
+information given by the program headers in 
+the elf file</em>).</p>
+
+<p>Most of the code found here is a replication
+of something that can be found in <a href="http://wiki.osdev.org/Main_Page">OSDev</a>
+or in <a href="http://www.jamesmolloy.co.uk/tutorial_html/">JamesM’s kernel development tutorials</a>.</p>
+
+<p>The base of the project itself is a clone of
+<a href="https://github.com/sortie">sortie’s</a> <a href="https://gitlab.com/sortie/meaty-skeleton.git">Meaty Skeleton</a>.
+repository.</p>
+
+<p>If you find any bug’s, or missing license or 
+credit information, please, feel free to contact-me.</p>
+
+
+      </section>
+    </div>
+
+    
+  </body>
+</html>

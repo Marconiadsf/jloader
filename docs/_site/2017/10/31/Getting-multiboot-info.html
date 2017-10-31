@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en-US" >
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/assets/css/style.css?v=">
+
+<!-- Begin Jekyll SEO tag v2.3.0 -->
+<title>Getting multiboot info | JLoader</title>
+<meta property="og:title" content="Getting multiboot info" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="2.Getting multiboot info" />
+<meta property="og:description" content="2.Getting multiboot info" />
+<link rel="canonical" href="http://localhost:4000/2017/10/31/Getting-multiboot-info.html" />
+<meta property="og:url" content="http://localhost:4000/2017/10/31/Getting-multiboot-info.html" />
+<meta property="og:site_name" content="JLoader" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2017-10-31T00:00:00-03:00" />
+<script type="application/ld+json">
+{"name":null,"description":"2.Getting multiboot info","author":null,"@type":"BlogPosting","url":"http://localhost:4000/2017/10/31/Getting-multiboot-info.html","publisher":null,"image":null,"headline":"Getting multiboot info","dateModified":"2017-10-31T00:00:00-03:00","datePublished":"2017-10-31T00:00:00-03:00","sameAs":null,"mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/2017/10/31/Getting-multiboot-info.html"},"@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>JLoader</h1>
+        <h2>JLoader is a freestanding program to load JAOS higher-half kernel</h2>
+
+        <section id="downloads">
+          
+            <a href="" class="btn">Download as .zip</a>
+            <a href="" class="btn">Download as .tar.gz</a>
+          
+          <a href="" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
+     <aside class="sidebar">
+		<section>
+			<span><a href="http://localhost:4000/JLoader"> &#62;&#62;Home</a></span><br>
+			
+			 
+				<!-- -->
+				<span><a href="/2017/10/31/Getting-multiboot-info.html"> &#62;&#62;Getting multiboot info</a></span><br>
+				  <!-- Oct 31, 2017 -->
+			  
+			
+			 
+				<!-- -->
+				<span><a href="/2017/10/30/Setup-environment.html"> &#62;&#62;Setup environment</a></span><br>
+				  <!-- Oct 30, 2017 -->
+			  
+			
+		</section>
+	  </aside>
+    <div class="container" >
+      <section id="main_content">
+        <h1 id="2getting-multiboot-info">2.Getting multiboot info</h1>
+
+<h2 id="21-intro">2.1 Intro</h2>
+
+<p>The first step after our program is loaded, is to retrieve some information given by Grub.
+The data location and magic value is stored in registers that we previously pushed to the stack in boot.S.</p>
+
+<p>The values are accessed in kernel_main function as parameters and we can use that to validate multiboot structure and load some useful information about our modules and memory.</p>
+
+<p>So, the first thing is to download a multiboot.h header that will provide us with the multiboot struct and some constants.</p>
+
+<p>I decided to put his file under kernel/include/arch/i386. I s up to you to decide if this file fits better a non arch related dir (I had used kernel/include/boot).</p>
+
+<p>Now it finally time to some coding. First things first, we are going to create a header to a new application we are about to create: boot.h.</p>
+
+<p><strong>boot.h</strong></p>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#ifndef __BOOT_H__
+#define __BOOT_H__
+</span>
+<span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">multiboot_init</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">magic</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">addr</span><span class="p">);</span>
+<span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">multiboot_getram</span><span class="p">();</span>
+<span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">multiboot_getinitrd</span><span class="p">();</span>
+<span class="cp">#endif
+</span></code></pre></div></div>
+
+<p>So, the first step in our <em>kernel_main</em> function will be validate and initialize the multiboot struct pointer for us.</p>
+
+<p>You can add a call to <em>multiboot_init</em> in <em>kernel_main</em> in the kernel.c file. Our kernel.c source will look like:</p>
+
+<p><strong>kernel.c</strong></p>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;stdint.h&gt;
+</span>
+<span class="cp">#include &lt;kernel/tty.h&gt;
+#include &lt;kernel/arch/i386/boot.h&gt;
+</span>
+<span class="kt">void</span> <span class="nf">kernel_main</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">magic</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">addr</span><span class="p">)</span> 
+<span class="p">{</span>
+	<span class="kt">uint32_t</span> <span class="n">free_adr</span><span class="p">;</span>
+	<span class="n">terminal_initialize</span><span class="p">();</span>
+	<span class="n">free_adr</span><span class="o">=</span><span class="p">(</span><span class="kt">uint32_t</span> <span class="p">)</span><span class="n">multiboot_init</span><span class="p">(</span><span class="n">magic</span><span class="p">,</span><span class="n">addr</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Here, <strong>free_adr</strong> is the address where our initial ramdisk ends. <strong>THAT’S NOT THE RIGHT WAY TO DO THAT!!!</strong>. You should instead add some other checks to be sure free_adr is really pointing to free memory. Modules could have been loaded before JLoader for example. The current version just read through the modules information and gets the higher end address. As addition it check if the address is under the 2 MB mark. If yes it sets <strong>free_ptr</strong> to the 2 MB mark. This is working, thought it may break if the placement address of JLoader and/or initrd.tar plus their size grows too much.</p>
+
+<p>Now we got what we need, lets implement <em>multiboot_init</em>.</p>
+
+<h2 id="22-multiboot-validation">2.2 Multiboot validation</h2>
+
+<p>All we need to do is check the values present in the multiboot struct
+count modules, retrieve its ending address.</p>
+
+<p>Create a new file in the kernel sources directory called <strong>boot.c</strong>.</p>
+
+<p><strong>boot.c</strong></p>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;stdio.h&gt;
+#include &lt;kernel/arch/i386/multiboot.h&gt;
+</span>
+<span class="n">multiboot_info_t</span> <span class="o">*</span><span class="n">mbi</span><span class="p">;</span>
+<span class="n">multiboot_module_t</span> <span class="o">*</span><span class="n">mod</span><span class="p">;</span>
+
+<span class="n">multiboot_uint32_t</span> <span class="nf">multiboot_check</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">magic</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">addr</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="k">if</span> <span class="p">(</span><span class="n">magic</span> <span class="o">!=</span> <span class="n">MULTIBOOT_BOOTLOADER_MAGIC</span><span class="p">)</span>
+		<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+	<span class="cm">/* Set MBI to the address of the Multiboot information structure. */</span>
+	<span class="n">mbi</span> <span class="o">=</span> <span class="p">(</span><span class="n">multiboot_info_t</span> <span class="o">*</span><span class="p">)</span> <span class="n">addr</span><span class="p">;</span>
+	  <span class="cm">/* is there a boot device set? */</span>
+	<span class="cm">/*if ((mbi-&gt;flags&amp;MULTIBOOT_INFO_BOOTDEV)
+	{
+		//do what?
+		//return 0;
+	}*/</span>
+	<span class="cm">/* Bits 4 and 5 are mutually exclusive! */</span>
+	<span class="k">if</span> <span class="p">((</span><span class="n">mbi</span><span class="o">-&gt;</span><span class="n">flags</span><span class="o">&amp;</span><span class="n">MULTIBOOT_INFO_AOUT_SYMS</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">mbi</span><span class="o">-&gt;</span><span class="n">flags</span><span class="o">&amp;</span><span class="n">MULTIBOOT_INFO_ELF_SHDR</span><span class="p">))</span>
+		<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+	<span class="cm">/* Are mmap_* valid? */</span>
+	<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">mbi</span><span class="o">-&gt;</span><span class="n">flags</span><span class="o">&amp;</span><span class="n">MULTIBOOT_INFO_MEM_MAP</span><span class="p">))</span>
+		<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+	<span class="k">if</span><span class="p">(</span><span class="n">mbi</span><span class="o">-&gt;</span><span class="n">flags</span><span class="o">&amp;</span><span class="n">MULTIBOOT_INFO_MODS</span><span class="p">)</span>
+		<span class="k">return</span>  <span class="n">_skip_modules_</span><span class="p">((</span><span class="n">multiboot_module_t</span> <span class="o">*</span><span class="p">)</span> <span class="n">mbi</span><span class="o">-&gt;</span><span class="n">mods_addr</span><span class="p">);</span>
+	<span class="k">else</span>
+		<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">multiboot_uint32_t</span> <span class="n">multiboot_init</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">magic</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">addr</span><span class="p">){</span>
+	<span class="n">multiboot_uint32_t</span> <span class="n">mpos</span><span class="o">=</span><span class="n">multiboot_check</span><span class="p">(</span><span class="n">magic</span><span class="p">,</span><span class="n">addr</span><span class="p">);</span>
+	<span class="k">if</span><span class="p">(</span><span class="n">mpos</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span>
+		<span class="n">printf</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">Multiboot_check(): Error! Check failed! POINTER: 0X%x"</span><span class="p">,</span><span class="n">mpos</span><span class="p">);</span>
+	<span class="k">return</span> <span class="n">mpos</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>We declare some globals that are going to be used during initialization.</p>
+
+<p>The <em>multiboot_check</em> function sets the global pointer <strong>mbi</strong>, and check for some bits in the <strong>mbi-&gt;flags</strong> field. If something goes wrong a 0 value is returned. If everything is ok it calls a inline function _ <em>skip_modules</em> _ that will check for possible modules loaded, and return the highest value of <strong>mod[i]_mod_end</strong></p>
+
+<p>The code for _ <em>skip_modules</em> _ :</p>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kr">inline</span> <span class="n">multiboot_uint32_t</span> <span class="n">_skip_modules_</span><span class="p">(</span><span class="n">multiboot_module_t</span> <span class="o">*</span><span class="n">mod</span><span class="p">){</span>
+	<span class="n">multiboot_uint32_t</span> <span class="n">lval</span><span class="o">=</span><span class="n">mod</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">mod_end</span><span class="p">;</span>
+	<span class="k">for</span> <span class="p">(</span><span class="n">multiboot_uint32_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">mbi</span><span class="o">-&gt;</span><span class="n">mods_count</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+		<span class="k">if</span><span class="p">(</span><span class="n">mod</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">mod_end</span><span class="o">&gt;</span><span class="n">lval</span><span class="p">)</span><span class="n">lval</span><span class="o">=</span><span class="n">mod</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">mod_end</span><span class="p">;</span>
+		
+	<span class="k">return</span> <span class="n">lval</span><span class="p">;</span>			
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Pretty straightforward. I did also implemented the following methods:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">multiboot_uint32_t</span> <span class="n">multiboot_getinitrd</span><span class="p">(){</span>
+	<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">mbi</span><span class="p">)</span>
+		<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+	<span class="n">mod</span><span class="o">=</span> <span class="p">(</span><span class="n">multiboot_module_t</span> <span class="o">*</span><span class="p">)</span> <span class="n">mbi</span><span class="o">-&gt;</span><span class="n">mods_addr</span><span class="p">;</span>
+	<span class="k">if</span><span class="p">(</span><span class="n">mbi</span><span class="o">-&gt;</span><span class="n">mods_count</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">)</span>
+		<span class="n">printf</span> <span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">Warning mods_count &gt; 1 (%d). Only first module start adr will be returned."</span><span class="p">,(</span><span class="kt">int</span><span class="p">)</span> <span class="n">mbi</span><span class="o">-&gt;</span><span class="n">mods_count</span><span class="p">);</span>
+	<span class="k">return</span> <span class="n">mod</span><span class="o">-&gt;</span><span class="n">mod_start</span><span class="p">;</span>
+
+<span class="p">}</span>
+
+<span class="n">multiboot_uint32_t</span> <span class="n">multiboot_getram</span><span class="p">(){</span>
+	<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">mbi</span><span class="p">)</span>
+		<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+	<span class="k">if</span> <span class="p">(</span><span class="n">mbi</span><span class="o">-&gt;</span><span class="n">flags</span><span class="o">&amp;</span><span class="n">MULTIBOOT_INFO_MEMORY</span><span class="p">)</span>
+		<span class="k">return</span> <span class="p">((</span><span class="n">multiboot_uint32_t</span><span class="p">)</span> <span class="n">mbi</span><span class="o">-&gt;</span><span class="n">mem_upper</span><span class="o">+</span><span class="n">mbi</span><span class="o">-&gt;</span><span class="n">mem_lower</span><span class="p">)</span><span class="o">*</span><span class="mi">1024</span><span class="p">;</span>
+	<span class="k">else</span>
+		<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>	
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>That are also self explanatory. The first one just return the address of the first module loaded, the second the amount of physical memory available.</p>
+
+<p>You may need to change multiboot_getinitrd if you plan to load more than one module to your kernel. I decided however to keep things simple and put all needed files inside a .tar file called initrd.tar.</p>
+
+<p>To make this code work you need to add some lines to your iso.sh file, so it can build a iso image with the initrd.tar file, and the according grub.cfg file. Modify your iso.sh file so it look something like this:</p>
+
+<p><strong>iso.sh</strong></p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#!/bin/sh</span>
+<span class="nb">set</span> <span class="nt">-e</span>
+<span class="nb">.</span> ./build.sh
+
+mkdir <span class="nt">-p</span> isodir
+mkdir <span class="nt">-p</span> isodir/boot
+mkdir <span class="nt">-p</span> isodir/boot/grub
+
+cp sysroot/boot/jloader isodir/boot/jloader
+cp path_to_tarfile/initrd.tar isodir/boot/initrd.tar
+<span class="nb">cat</span> <span class="o">&gt;</span> isodir/boot/grub/grub.cfg <span class="o">&lt;&lt;</span> <span class="no">EOF</span><span class="sh">
+menuentry "JAOS" {
+	multiboot /boot/jloader
+	module    /boot/initrd.tar
+}
+</span><span class="no">EOF
+</span>grub-mkrescue <span class="nt">-o</span> jaos.iso isodir
+</code></pre></div></div>
+<p>I strongly recommend that your “path_to_tarfile” points to somewhere out of the build dir, for let things simple clean. Remember that if you put this into sysroot, every time you run clean.sh the sysroot dir is removed.</p>
+
+<p>You can create a tar file from any file using command line, just watch out against too big files.</p>
+
+<p>The methods implemented here can be found at JLoader commit <a href="empty">empty</a>.</p>
+
+      </section>
+    </div>
+
+    
+  </body>
+</html>

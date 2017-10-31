@@ -11,7 +11,7 @@ Welcome to JLoader (JAOS Loader )home page.
 JLoader is a second stage boot loader for my 
 Hobby operational system, JAOS.
 
-Currently it depends on grub to work. After
+Currently it depends on Grub to work. After
 loading, it will search in a initrd.tar file
 loaded as a module for the kernel file, load 
 it in the higher half of virtual memory, at 

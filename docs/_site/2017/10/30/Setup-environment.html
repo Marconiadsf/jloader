@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en-US" >
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/assets/css/style.css?v=">
+
+<!-- Begin Jekyll SEO tag v2.3.0 -->
+<title>Setup environment | JLoader</title>
+<meta property="og:title" content="Setup environment" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="1.Setup environment" />
+<meta property="og:description" content="1.Setup environment" />
+<link rel="canonical" href="http://localhost:4000/2017/10/30/Setup-environment.html" />
+<meta property="og:url" content="http://localhost:4000/2017/10/30/Setup-environment.html" />
+<meta property="og:site_name" content="JLoader" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2017-10-30T00:00:00-03:00" />
+<script type="application/ld+json">
+{"name":null,"description":"1.Setup environment","author":null,"@type":"BlogPosting","url":"http://localhost:4000/2017/10/30/Setup-environment.html","publisher":null,"image":null,"headline":"Setup environment","dateModified":"2017-10-30T00:00:00-03:00","datePublished":"2017-10-30T00:00:00-03:00","sameAs":null,"mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/2017/10/30/Setup-environment.html"},"@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>JLoader</h1>
+        <h2>JLoader is a freestanding program to load JAOS higher-half kernel</h2>
+
+        <section id="downloads">
+          
+            <a href="" class="btn">Download as .zip</a>
+            <a href="" class="btn">Download as .tar.gz</a>
+          
+          <a href="" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
+     <aside class="sidebar">
+		<section>
+			<span><a href="http://localhost:4000/JLoader"> &#62;&#62;Home</a></span><br>
+			
+			 
+				<!-- -->
+				<span><a href="/2017/10/31/Getting-multiboot-info.html"> &#62;&#62;Getting multiboot info</a></span><br>
+				  <!-- Oct 31, 2017 -->
+			  
+			
+			 
+				<!-- -->
+				<span><a href="/2017/10/30/Setup-environment.html"> &#62;&#62;Setup environment</a></span><br>
+				  <!-- Oct 30, 2017 -->
+			  
+			
+		</section>
+	  </aside>
+    <div class="container" >
+      <section id="main_content">
+        <h1 id="1setup-environment">1.Setup environment</h1>
+
+<p>The environment and tools needed to build
+JLoader are the same used in building a hobby
+OS kernel.</p>
+
+<p>If you already have a cross compiler and is 
+following this page just to find something neat, 
+you can skip the steps below.</p>
+
+<p>You shall build your own cross compiler. I am
+currently working on a Ubuntu 16.04 host OS,
+and was able to build GCC 7.2, along with 
+binutils 2.29. The target is i686-elf. 
+For more information please check OSDev wiki for 
+how to build a gcc cross compiler.</p>
+
+<p>After finishing creating your cross compiler,
+next step is getting the sources of a kernel 
+skeleton. For a initial set you can both clone 
+Meaty Skeleton repository (more information at 
+OSDev wiki) or clone JLoader commit <a href="https://github.com/Marconiadsf/JLoader/tree/cd571cd8f6b96ed881a63a4a58a52aedb753b6e1">cd571cd</a>.</p>
+
+<p>If you clone JLoader (recommended) you will get 
+improved versions of tty initial driver, printf,
+and some extra string functions. There will be 
+also some differences to the boot.S file in the
+kernel/arch/i386/ directory. Check that.</p>
+
+<p>For both options you need to change the following
+line in your config.sh file:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">"</span><span class="nv">$HOME</span><span class="s2">/opt/cross/bin:</span><span class="nv">$PATH</span><span class="s2">"</span>
+</code></pre></div></div>
+<p>to the right path to your cross compiler.</p>
+
+
+      </section>
+    </div>
+
+    
+  </body>
+</html>
