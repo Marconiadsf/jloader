@@ -165,8 +165,9 @@ menuentry "JAOS" {
 EOF
 grub-mkrescue -o jaos.iso isodir
 ```
+
 I strongly recommend that your "path_to_tarfile" points to somewhere out of the build dir, for let things simple clean. Remember that if you put this into sysroot, every time you run clean.sh the sysroot dir is removed.
 
 You can create a tar file from any file using command line, just watch out against too big files.
 
-The methods implemented here can be found at JLoader commit [empty](empty).
+The methods implemented here can be found at JLoader commit [552ed87](https://github.com/Marconiadsf/JLoader/tree/552ed879760b4f20e79739cce698ead6770397f5).
